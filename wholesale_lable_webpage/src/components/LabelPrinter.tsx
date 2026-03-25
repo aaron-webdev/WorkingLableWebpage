@@ -120,7 +120,7 @@ const LabelPrinter: React.FC = () => {
 
   return (
     <div style={{ padding: '30px', maxWidth: '650px', margin: '0 auto', fontFamily: 'Arial, sans-serif' }}>
-      <h2 style={{ textAlign: 'center', marginBottom: '25px' }}>Bread Label Printer</h2>
+      <h1 style={{ textAlign: 'center', marginBottom: '25px' }}>Wholesale Label Printer</h1>
 
       <div style={{ display: 'grid', gap: '20px' }}>
         {/* Product Selection */}

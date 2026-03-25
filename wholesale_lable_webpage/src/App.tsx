@@ -1,21 +1,12 @@
-
-
-import './App.css'
+import LabelPrinter from './components/LabelPrinter';
+import './App.css'; // Optional: keep or remove existing styles
 
 function App() {
-
   return (
-    <>
-      <section id="center">
-        <div>
-          <h1>Wholesale Lable Maker</h1>
-        </div>
-        <div>
-          <h2>Select product and destination then click "print".</h2>
-        </div>
-      </section>
-    </>
-  )
+    <div className="App">
+      <LabelPrinter />
+    </div>
+  );
 }
 
-export default App
+export default App;

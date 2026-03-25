@@ -1,12 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
 
-const productList: Record<string, {
-  ingredients: string;
-  tips: string;
-  disclaimer: string;
-  shelfLife: number;
-}> = {
+const productList = {
   'SOURDOUGH': {
     ingredients: 'WHEAT FLOUR, RYE FLOUR, SALT, WATER',
     tips: 'TIP: SLICE YOUR BREAD BEFORE FREEZING IT SO YOU CAN REHEAT IT BY THE SLICE- FIRST TOAST WILL REFRESH YOUR BREAD, SECOND TOAST WILL TOAST YOUR BREAD',
@@ -96,7 +91,7 @@ const LabelPrinter: React.FC = () => {
     documentTitle: 'Bread Label',
     pageStyle: `
       @page {
-        size: 2in 1.25in;   /* Adjust to your label size: e.g. 2in x 1.25in or 4in x 2in */
+        size: 2in 1.25in;   /* Adjust this to match your actual label size */
         margin: 0;
       }
       @media print {
@@ -106,80 +101,111 @@ const LabelPrinter: React.FC = () => {
     `,
   });
 
-  const isFormComplete = selectedProduct && selectedWholesaler && quantity > 0;
+  const isFormComplete = selectedProduct && selectedWholesaler && quantity >= 1;
 
-  const productData = productList[selectedProduct];
+  const productData = productList[selectedProduct as keyof typeof productList];
+
+  // Handle quantity from number input
+  const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value);
+    if (!isNaN(value)) {
+      setQuantity(Math.max(1, Math.min(50, value)));
+    }
+  };
+
+  // Handle quantity from dropdown
+  const handleDropdownQuantity = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setQuantity(parseInt(e.target.value));
+  };
 
   return (
-    <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto', fontFamily: 'Arial, sans-serif' }}>
-      <h2>Bread Label Printer</h2>
+    <div style={{ padding: '30px', maxWidth: '650px', margin: '0 auto', fontFamily: 'Arial, sans-serif' }}>
+      <h2 style={{ textAlign: 'center', marginBottom: '25px' }}>Bread Label Printer</h2>
 
-      <div style={{ display: 'grid', gap: '15px', marginBottom: '20px' }}>
+      <div style={{ display: 'grid', gap: '20px' }}>
+        {/* Product Selection */}
         <div>
-          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+          <label style={{ display: 'block', marginBottom: '6px', fontWeight: 'bold' }}>
             Product:
           </label>
           <select
             value={selectedProduct}
             onChange={(e) => setSelectedProduct(e.target.value)}
-            style={{ width: '100%', padding: '8px', fontSize: '16px' }}
+            style={{ width: '100%', padding: '10px', fontSize: '16px' }}
           >
             <option value="">-- Select Product --</option>
             {Object.keys(productList).map((prod) => (
-              <option key={prod} value={prod}>{prod}</option>
+              <option key={prod} value={prod}>
+                {prod}
+              </option>
             ))}
           </select>
         </div>
 
+        {/* Quantity - Dual Input */}
         <div>
-          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-            Quantity (1–50):
+          <label style={{ display: 'block', marginBottom: '6px', fontWeight: 'bold' }}>
+            Quantity (type the number you want to print):
           </label>
-          <input
-            type="number"
-            min={1}
-            max={50}
-            value={quantity}
-            onChange={(e) => setQuantity(Math.max(1, Math.min(50, parseInt(e.target.value) || 1)))}
-            style={{ width: '100%', padding: '8px', fontSize: '16px' }}
-          />
+          <div style={{ display: 'flex', gap: '12px' }}>
+            {/* Number Input */}
+            <input
+              type="number"
+              min={1}
+              max={50}
+              value={quantity}
+              onChange={handleQuantityChange}
+              style={{
+                flex: 1,
+                padding: '10px',
+                fontSize: '16px',
+                width: '120px',
+              }}
+            />
+          </div>
         </div>
 
+        {/* Wholesaler Selection */}
         <div>
-          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+          <label style={{ display: 'block', marginBottom: '6px', fontWeight: 'bold' }}>
             Wholesaler:
           </label>
           <select
             value={selectedWholesaler}
             onChange={(e) => setSelectedWholesaler(e.target.value)}
-            style={{ width: '100%', padding: '8px', fontSize: '16px' }}
+            style={{ width: '100%', padding: '10px', fontSize: '16px' }}
           >
             <option value="">-- Select Wholesaler --</option>
             {wholesalers.map((w) => (
-              <option key={w} value={w}>{w}</option>
+              <option key={w} value={w}>
+                {w}
+              </option>
             ))}
           </select>
         </div>
       </div>
 
+      {/* Print Button */}
       <button
         onClick={handlePrint}
         disabled={!isFormComplete}
         style={{
-          padding: '12px 24px',
+          marginTop: '30px',
+          width: '100%',
+          padding: '14px',
           fontSize: '18px',
-          backgroundColor: isFormComplete ? '#007bff' : '#ccc',
+          backgroundColor: isFormComplete ? '#007bff' : '#cccccc',
           color: 'white',
           border: 'none',
-          borderRadius: '4px',
+          borderRadius: '6px',
           cursor: isFormComplete ? 'pointer' : 'not-allowed',
-          width: '100%',
+          fontWeight: 'bold',
         }}
       >
-        Print Labels ({quantity})
+        Print {quantity} Label{quantity > 1 ? 's' : ''}
       </button>
 
-      {/* Hidden printable label */}
+      {/* Hidden Printable Content */}
       {productData && (
         <div style={{ display: 'none' }}>
           <div ref={componentRef}>
@@ -187,33 +213,33 @@ const LabelPrinter: React.FC = () => {
               <div
                 key={index}
                 style={{
-                  width: '2in',           // Change to match your label width
-                  height: '1.25in',       // Change to match your label height
-                  padding: '0.1in',
+                  width: '2in',
+                  height: '1.25in',
+                  padding: '0.12in',
                   border: '1px dashed #ccc',
-                  margin: '10px auto',
-                  fontSize: '10pt',
-                  lineHeight: '1.2',
+                  margin: '15px auto',
+                  fontSize: '9.5pt',
+                  lineHeight: '1.25',
                   pageBreakAfter: index < quantity - 1 ? 'always' : 'avoid',
                   fontFamily: 'Arial, sans-serif',
                 }}
               >
-                <div style={{ textAlign: 'center', fontWeight: 'bold', marginBottom: '4px' }}>
+                <div style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '11pt', marginBottom: '5px' }}>
                   {selectedProduct}
                 </div>
 
-                <div style={{ fontSize: '9pt', marginBottom: '4px' }}>
+                <div style={{ fontSize: '8.5pt', marginBottom: '5px' }}>
                   <strong>Ingredients:</strong><br />
                   {productData.ingredients}
                 </div>
 
                 {productData.tips && (
-                  <div style={{ fontSize: '8pt', marginBottom: '4px' }}>
+                  <div style={{ fontSize: '8pt', marginBottom: '5px' }}>
                     {productData.tips}
                   </div>
                 )}
 
-                <div style={{ fontSize: '9pt', marginBottom: '4px' }}>
+                <div style={{ fontSize: '8.5pt', marginBottom: '6px' }}>
                   <strong>Disclaimer:</strong><br />
                   {productData.disclaimer}
                 </div>
@@ -223,7 +249,7 @@ const LabelPrinter: React.FC = () => {
                   <span>{printDate}</span>
                 </div>
 
-                <div style={{ textAlign: 'center', fontSize: '8pt', marginTop: '6px' }}>
+                <div style={{ textAlign: 'center', fontSize: '8pt', marginTop: '8px' }}>
                   {selectedWholesaler}
                 </div>
               </div>
@@ -232,8 +258,8 @@ const LabelPrinter: React.FC = () => {
         </div>
       )}
 
-      <p style={{ marginTop: '20px', fontSize: '14px', color: '#555' }}>
-        <strong>Printing instructions:</strong> When the print dialog appears, select your thermal label printer, choose <em>Actual size</em> or 100% scale, and disable headers/footers.
+      <p style={{ marginTop: '25px', fontSize: '14px', color: '#555', textAlign: 'center' }}>
+        <strong>Tip:</strong> In the print dialog, select your thermal printer and choose <em>Actual size</em> or 100% scale.
       </p>
     </div>
   );

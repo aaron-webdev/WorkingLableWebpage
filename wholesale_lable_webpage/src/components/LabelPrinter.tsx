@@ -72,7 +72,7 @@ const productList = {
     ingredients: 'semi-sweet chocolate chips (sugar, chocolate liquor, milkfat, cocoa butter, soy lecithin), brown sugar, butter, all-purpose flour (unbleached hard red wheat flour, malted barley flour), sugar, eggs, cocoa powder, baking soda, salt, cornstarch',
     tips: '',
     disclaimer: 'CONTAINS: wheat, soy, dairy, egg',
-    shelfLife: 0,
+    shelfLife: 7,
   },
 };
 
@@ -111,11 +111,6 @@ const LabelPrinter: React.FC = () => {
     if (!isNaN(value)) {
       setQuantity(Math.max(1, Math.min(50, value)));
     }
-  };
-
-  // Handle quantity from dropdown
-  const handleDropdownQuantity = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setQuantity(parseInt(e.target.value));
   };
 
   return (
@@ -205,7 +200,7 @@ const LabelPrinter: React.FC = () => {
         Print {quantity} Label{quantity > 1 ? 's' : ''}
       </button>
 
-      {/* Hidden Printable Content */}
+      {/*Printable Content */}
       {productData && (
         <div style={{ display: 'none' }}>
           <div ref={componentRef}>
